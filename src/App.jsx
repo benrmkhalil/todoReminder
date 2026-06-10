@@ -61,7 +61,8 @@ function App() {
     try {
       await signInWithPopup(auth, googleProvider)
     } catch (authError) {
-      setError('Google sign-in failed. Please try again.')
+      console.error('Google sign-in error:', authError)
+      setError(authError?.message || 'Google sign-in failed. Please try again.')
     }
   }
 
