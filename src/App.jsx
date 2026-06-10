@@ -30,18 +30,12 @@ function localDateTimeInputValue(date = new Date()) {
   return local.toISOString().slice(0, 16)
 }
 
-function localDateString(date = new Date()) {
-  const tzOffset = date.getTimezoneOffset()
-  const local = new Date(date.getTime() - tzOffset * 60000)
-  return local.toISOString().slice(0, 10)
-}
 
 function App() {
   const [user, setUser] = useState(null)
   const [tasks, setTasks] = useState([])
   const [title, setTitle] = useState('')
   const [dueAt, setDueAt] = useState('')
-  const [dueTime, setDueTime] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
@@ -119,7 +113,6 @@ function App() {
     await signOut(auth)
     setTitle('')
     setDueAt('')
-    setDueTime('')
     setTasks([])
   }
 
@@ -129,21 +122,17 @@ function App() {
       setError('Enter a reminder title before saving.')
       return
     }
-    let finalDue = null
-    if (dueAt) finalDue = dueAt
-    else if (dueTime) finalDue = `${localDateString()}T${dueTime}`
 
     const nextTask = {
       id: crypto.randomUUID(),
       text: title.trim(),
-      dueAt: finalDue || null,
+      dueAt: dueAt || null,
       completed: false,
       createdAt: new Date().toISOString(),
     }
     setTasks((current) => [nextTask, ...current])
     setTitle('')
     setDueAt('')
-    setDueTime('')
     setError('')
   }
 
@@ -171,6 +160,8 @@ function App() {
     const diff = new Date(d) - now
     return diff > 0 && diff <= 1000 * 60 * 60 * 24 * 2 // within 48 hours
   }
+
+  
 
   return (
     <div className="app-shell">
@@ -295,15 +286,7 @@ function App() {
                   onChange={(event) => setDueAt(event.target.value)}
                 />
               </label>
-              <label>
-                Or pick a time only (today)
-                <input
-                  type="time"
-                  min={localDateTimeInputValue().slice(11)}
-                  value={dueTime}
-                  onChange={(event) => setDueTime(event.target.value)}
-                />
-              </label>
+              
               <button className="button-primary" type="submit">
                 Save reminder
               </button>
