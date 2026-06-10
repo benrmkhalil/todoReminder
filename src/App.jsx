@@ -6,6 +6,7 @@ import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from 'firebase/auth'
 import './App.css'
 
@@ -29,6 +30,7 @@ function App() {
   const [dueAt, setDueAt] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('')
   const [isRegister, setIsRegister] = useState(false)
   const [error, setError] = useState('')
 
@@ -80,9 +82,16 @@ function App() {
       return
     }
 
+    if (isRegister && !username.trim()) {
+      setError('Enter a username to create an account.')
+      return
+    }
+
     try {
       if (isRegister) {
-        await createUserWithEmailAndPassword(auth, email.trim(), password)
+        const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password)
+        await updateProfile(userCredential.user, { displayName: username.trim() })
+        setUsername('')
       } else {
         await signInWithEmailAndPassword(auth, email.trim(), password)
       }
@@ -137,20 +146,30 @@ function App() {
     <div className="app-shell">
       <header className="hero-panel">
         <div className="hero-copy">
-          <p className="eyebrow">Reminder Hub</p>
-          <h1>Personal reminders that feel like a real productivity app.</h1>
+          <p className="eyebrow">Task Management</p>
+          <h1>Never miss what matters. Organize your priorities.</h1>
           <p className="hero-text">
-            Save tasks, schedule follow-ups, and keep everything in one polished
-            dashboard. Sign in with Google to keep your reminders linked to your
-            account and available in your browser.
+            A clean, distraction-free space to capture reminders, deadlines, and follow-ups. 
+            Stay on top of your goals with simple task tracking.
           </p>
           {!user ? (
             <div className="auth-card">
               <div className="auth-card-header">
-                <p className="eyebrow">Sign in</p>
-                <h2>{isRegister ? 'Create your account' : 'Welcome back'}</h2>
+                <p className="eyebrow">Get started</p>
+                <h2>{isRegister ? 'Create your account' : 'Sign in to continue'}</h2>
               </div>
               <form className="auth-form" onSubmit={handleEmailSubmit}>
+                {isRegister && (
+                  <label>
+                    Username
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(event) => setUsername(event.target.value)}
+                      placeholder="Choose a username"
+                    />
+                  </label>
+                )}
                 <label>
                   Email address
                   <input
@@ -175,7 +194,17 @@ function App() {
               </form>
               <p className="auth-alt">
                 {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
-                <button type="button" className="button-link" onClick={() => setIsRegister((current) => !current)}>
+                <button 
+                  type="button" 
+                  className="button-link" 
+                  onClick={() => {
+                    setIsRegister((current) => !current)
+                    setEmail('')
+                    setPassword('')
+                    setUsername('')
+                    setError('')
+                  }}
+                >
                   {isRegister ? 'Sign in' : 'Create one'}
                 </button>
               </p>
@@ -206,25 +235,6 @@ function App() {
             </div>
           )}
         </div>
-        <div className="hero-card">
-          <div className="hero-status">
-            <span>Overview</span>
-            <strong>{new Date().toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })}</strong>
-          </div>
-          <div className="hero-stats">
-            <div>
-              <span>All reminders</span>
-              <strong>{tasks.length}</strong>
-            </div>
-            <div>
-              <span>Completed</span>
-              <strong>{completedCount}</strong>
-            </div>
-          </div>
-          <div className="hero-notice">
-            <p>Use the form below to add a reminder, then mark it complete when it's done.</p>
-          </div>
-        </div>
       </header>
 
       {user && (
@@ -232,22 +242,22 @@ function App() {
           <section className="task-form-card">
             <div className="panel-heading">
               <div>
-                <p className="eyebrow">New reminder</p>
-                <h2>Create quick task</h2>
+                <p className="eyebrow">Add task</p>
+                <h2>Capture your next action</h2>
               </div>
-              <span className="pill">Instant save</span>
+              <span className="pill">Quick save</span>
             </div>
             <form className="task-form" onSubmit={addTask}>
               <label>
-                What do you need to remember?
+                What's your next action?
                 <input
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
-                  placeholder="Enter a reminder title"
+                  placeholder="Add a task or reminder"
                 />
               </label>
               <label>
-                Due date
+                Due date or time
                 <input
                   type="datetime-local"
                   value={dueAt}
@@ -263,14 +273,14 @@ function App() {
           <section className="task-list-card">
             <div className="panel-heading">
               <div>
-                <p className="eyebrow">Your reminders</p>
-                <h2>Today’s list</h2>
+                <p className="eyebrow">All tasks</p>
+                <h2>Your progress</h2>
               </div>
               <span className="pill secondary">{tasks.length} items</span>
             </div>
             {tasks.length === 0 ? (
               <div className="empty-state">
-                <p>No reminders yet. Add one to get started and stay on top of your day.</p>
+                <p>No tasks yet. Add your first task to get organized.</p>
               </div>
             ) : (
               <ul className="task-list">

@@ -18,17 +18,20 @@
 }
 
 .hero-panel {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 1.8rem;
-  align-items: stretch;
 }
 
 .hero-copy {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .auth-card {
@@ -39,7 +42,9 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.05);
   box-shadow: 0 22px 60px rgba(0, 0, 0, 0.16);
-  max-width: 460px;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
 }
 
 .auth-card-header h2 {
@@ -135,21 +140,24 @@
   text-transform: uppercase;
   opacity: 0.8;
   margin: 0;
+  text-align: center;
 }
 
 .hero-copy h1,
 .panel-heading h2 {
   margin: 0;
-  font-size: clamp(2rem, 2.6vw, 3.4rem);
+  font-size: clamp(1.8rem, 2.4vw, 3rem);
   line-height: 1.02;
+  text-align: center;
 }
 
 .hero-text {
-  max-width: 42rem;
+  max-width: 55rem;
   color: rgba(255, 255, 255, 0.84);
-  margin: 0;
+  margin: 0 auto;
   font-size: 1.05rem;
   line-height: 1.8;
+  text-align: center;
 }
 
 .button-primary,
@@ -180,13 +188,22 @@
 
 .profile-strip {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   gap: 1rem;
-  align-items: flex-start;
+  align-items: center;
+  flex-direction: column;
   padding: 1.6rem;
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
+  max-width: 520px;
+  text-align: center;
+}
+
+.profile-strip div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .profile-strip h2 {
@@ -197,6 +214,10 @@
 .profile-strip p {
   margin: 0.25rem 0 0;
   opacity: 0.82;
+}
+
+.profile-strip .button-ghost {
+  margin-top: 0.5rem;
 }
 
 .hero-card {
@@ -253,10 +274,43 @@
   color: rgba(255, 255, 255, 0.86);
 }
 
+.hero-next-task {
+  background: rgba(72, 198, 255, 0.12);
+  padding: 1.2rem;
+  border-radius: 20px;
+  border: 1px solid rgba(72, 198, 255, 0.2);
+}
+
+.hero-next-label {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.hero-next-title {
+  margin: 0.5rem 0 0;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hero-next-time {
+  margin: 0.3rem 0 0;
+  color: rgba(72, 198, 255, 0.88);
+  font-size: 0.9rem;
+}
+
 .dashboard-panel {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr 1.2fr;
   gap: 1.8rem;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .task-form-card,
@@ -412,7 +466,6 @@
 }
 
 @media (max-width: 960px) {
-  .hero-panel,
   .dashboard-panel {
     grid-template-columns: 1fr;
   }
