@@ -1,2 +1,2 @@
 # todoReminder
-Simple task reminder webapp
+Simple task reminder REACTapp
