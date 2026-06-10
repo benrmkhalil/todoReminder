@@ -23,11 +23,25 @@ function formatDate(dateString) {
   })
 }
 
+// return local string like 'YYYY-MM-DDTHH:MM' for datetime-local inputs
+function localDateTimeInputValue(date = new Date()) {
+  const tzOffset = date.getTimezoneOffset()
+  const local = new Date(date.getTime() - tzOffset * 60000)
+  return local.toISOString().slice(0, 16)
+}
+
+function localDateString(date = new Date()) {
+  const tzOffset = date.getTimezoneOffset()
+  const local = new Date(date.getTime() - tzOffset * 60000)
+  return local.toISOString().slice(0, 10)
+}
+
 function App() {
   const [user, setUser] = useState(null)
   const [tasks, setTasks] = useState([])
   const [title, setTitle] = useState('')
   const [dueAt, setDueAt] = useState('')
+  const [dueTime, setDueTime] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
@@ -105,6 +119,7 @@ function App() {
     await signOut(auth)
     setTitle('')
     setDueAt('')
+    setDueTime('')
     setTasks([])
   }
 
@@ -114,16 +129,21 @@ function App() {
       setError('Enter a reminder title before saving.')
       return
     }
+    let finalDue = null
+    if (dueAt) finalDue = dueAt
+    else if (dueTime) finalDue = `${localDateString()}T${dueTime}`
+
     const nextTask = {
       id: crypto.randomUUID(),
       text: title.trim(),
-      dueAt: dueAt || null,
+      dueAt: finalDue || null,
       completed: false,
       createdAt: new Date().toISOString(),
     }
     setTasks((current) => [nextTask, ...current])
     setTitle('')
     setDueAt('')
+    setDueTime('')
     setError('')
   }
 
@@ -141,6 +161,16 @@ function App() {
 
   const userName = user?.displayName?.split(' ')[0] || 'Guest'
   const upcomingTasks = tasks.filter((task) => !task.completed)
+  const now = new Date()
+  const isDatePast = (d) => {
+    if (!d) return false
+    return new Date(d) < now
+  }
+  const isDateSoon = (d) => {
+    if (!d) return false
+    const diff = new Date(d) - now
+    return diff > 0 && diff <= 1000 * 60 * 60 * 24 * 2 // within 48 hours
+  }
 
   return (
     <div className="app-shell">
@@ -155,8 +185,8 @@ function App() {
           {!user ? (
             <div className="auth-card">
               <div className="auth-card-header">
-                <p className="eyebrow">Get started</p>
-                <h2>{isRegister ? 'Create your account' : 'Sign in to continue'}</h2>
+                <p className="eyebrow">{isRegister ? 'Create account' : 'Sign in'}</p>
+                <h2>{isRegister ? 'Join and start organizing' : 'Welcome back'}</h2>
               </div>
               <form className="auth-form" onSubmit={handleEmailSubmit}>
                 {isRegister && (
@@ -218,7 +248,7 @@ function App() {
                     <path d="M44.5 20H24v8.5h11.8c-1.1 3.2-3.8 5.8-7.1 6.8v5.6c6.6-1.2 11.8-6.9 11.8-12.9 0-.9-.1-1.8-.2-2.5Z" fill="#1976D2"/>
                   </svg>
                 </span>
-                Continue with Google
+                {isRegister ? 'Sign up with Google' : 'Continue with Google'}
               </button>
               {error && <p className="form-error">{error}</p>}
             </div>
@@ -260,8 +290,18 @@ function App() {
                 Due date or time
                 <input
                   type="datetime-local"
+                  min={localDateTimeInputValue()}
                   value={dueAt}
                   onChange={(event) => setDueAt(event.target.value)}
+                />
+              </label>
+              <label>
+                Or pick a time only (today)
+                <input
+                  type="time"
+                  min={localDateTimeInputValue().slice(11)}
+                  value={dueTime}
+                  onChange={(event) => setDueTime(event.target.value)}
                 />
               </label>
               <button className="button-primary" type="submit">
@@ -284,22 +324,34 @@ function App() {
               </div>
             ) : (
               <ul className="task-list">
-                {tasks.map((task) => (
-                  <li key={task.id} className={task.completed ? 'task-item completed' : 'task-item'}>
-                    <div className="task-main">
-                      <button className="task-toggle" onClick={() => toggleTask(task.id)}>
-                        {task.completed ? '✓' : ''}
-                      </button>
-                      <div>
-                        <p className="task-title">{task.text}</p>
-                        <p className="task-meta">{formatDate(task.dueAt)}</p>
+                {tasks.map((task) => {
+                  const overdue = !task.completed && isDatePast(task.dueAt)
+                  const soon = !task.completed && isDateSoon(task.dueAt)
+                  return (
+                    <li key={task.id} className={task.completed ? 'task-item completed' : 'task-item'}>
+                      <div className="task-main">
+                        <button className="task-toggle" onClick={() => toggleTask(task.id)}>
+                          {task.completed ? '✓' : ''}
+                        </button>
+                        <div>
+                          <p className="task-title">{task.text}</p>
+                          <p className={`task-meta ${overdue ? 'overdue' : soon ? 'soon' : ''}`}>
+                            <svg className="task-calendar-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M7 10h5v5H7z" fill="currentColor" opacity="0.15"/>
+                              <path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM5 8h14v2H5V8zm14 12H5V11h14v9z" fill="currentColor"/>
+                            </svg>
+                            {task.dueAt ? formatDate(task.dueAt) : 'No due date'}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    <button className="task-delete" onClick={() => deleteTask(task.id)}>
-                      Remove
-                    </button>
-                  </li>
-                ))}
+                      <div className="task-actions">
+                        <button className="task-delete" onClick={() => deleteTask(task.id)}>
+                          Remove
+                        </button>
+                      </div>
+                    </li>
+                  )
+                })}
               </ul>
             )}
           </section>

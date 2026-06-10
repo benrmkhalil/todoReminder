@@ -433,8 +433,36 @@
 
 .task-meta {
   margin: 0.2rem 0 0;
-  color: rgba(255, 255, 255, 0.62);
-  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.task-calendar-icon {
+  opacity: 0.9;
+}
+
+.task-meta.soon {
+  background: linear-gradient(90deg, rgba(255,230,150,0.12), rgba(255,200,100,0.08));
+  border-color: rgba(255,200,100,0.16);
+  color: #ffe8b0;
+}
+
+.task-meta.overdue {
+  background: linear-gradient(90deg, rgba(255,120,120,0.12), rgba(255,80,80,0.06));
+  border-color: rgba(255,80,80,0.18);
+  color: #ffb0b0;
+}
+
+.task-actions {
+  display: flex;
+  align-items: center;
 }
 
 .task-delete {
