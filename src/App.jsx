@@ -111,21 +111,21 @@ function App() {
     <div className="app-shell">
       <header className="hero-panel">
         <div className="hero-copy">
-          <p className="eyebrow">Todo Reminder</p>
-          <h1>Beautiful reminders powered by Google login.</h1>
+          <p className="eyebrow">Reminder Hub</p>
+          <h1>Personal reminders that feel like a real productivity app.</h1>
           <p className="hero-text">
-            Manage your tasks, set reminders, and stay organized in one crisp
-            dashboard. Sign in with your Google account to sync tasks locally and
-            keep your workflow flowing.
+            Save tasks, schedule follow-ups, and keep everything in one polished
+            dashboard. Sign in with Google to keep your reminders linked to your
+            account and available in your browser.
           </p>
           {!user ? (
             <button className="button-primary" onClick={handleLogin}>
-              Continue with Google
+              Sign in with Google
             </button>
           ) : (
             <div className="profile-strip">
               <div>
-                <p className="small-label">Welcome back,</p>
+                <p className="small-label">Signed in as</p>
                 <h2>{userName}</h2>
                 <p>{upcomingTasks.length} active reminder(s)</p>
               </div>
@@ -138,12 +138,12 @@ function App() {
         </div>
         <div className="hero-card">
           <div className="hero-status">
-            <span>Today</span>
+            <span>Overview</span>
             <strong>{new Date().toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })}</strong>
           </div>
           <div className="hero-stats">
             <div>
-              <span>Tasks</span>
+              <span>All reminders</span>
               <strong>{tasks.length}</strong>
             </div>
             <div>
@@ -152,7 +152,7 @@ function App() {
             </div>
           </div>
           <div className="hero-notice">
-            <p>Keep your reminders organized and never miss a follow-up.</p>
+            <p>Use the form below to add a reminder, then mark it complete when it's done.</p>
           </div>
         </div>
       </header>
@@ -162,18 +162,18 @@ function App() {
           <section className="task-form-card">
             <div className="panel-heading">
               <div>
-                <p className="eyebrow">Create reminder</p>
-                <h2>Quick add</h2>
+                <p className="eyebrow">New reminder</p>
+                <h2>Create quick task</h2>
               </div>
-              <span className="pill">Fast & friendly</span>
+              <span className="pill">Instant save</span>
             </div>
             <form className="task-form" onSubmit={addTask}>
               <label>
-                Reminder title
+                What do you need to remember?
                 <input
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
-                  placeholder="What do you want to remember?"
+                  placeholder="Enter a reminder title"
                 />
               </label>
               <label>
@@ -194,13 +194,13 @@ function App() {
             <div className="panel-heading">
               <div>
                 <p className="eyebrow">Your reminders</p>
-                <h2>Inbox</h2>
+                <h2>Today’s list</h2>
               </div>
-              <span className="pill secondary">{tasks.length} total</span>
+              <span className="pill secondary">{tasks.length} items</span>
             </div>
             {tasks.length === 0 ? (
               <div className="empty-state">
-                <p>No reminders yet. Add your first reminder to begin.</p>
+                <p>No reminders yet. Add one to get started and stay on top of your day.</p>
               </div>
             ) : (
               <ul className="task-list">
